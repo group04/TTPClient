@@ -67,7 +67,7 @@ public class KeyManager {
 	 * @param keyPair
 	 * @return
 	 */
-	public static Key getPrivateKey(KeyPair keyPair)
+	public static PrivateKey getPrivateKey(KeyPair keyPair)
 	{
 		return keyPair.getPrivate();
 	}
@@ -77,7 +77,7 @@ public class KeyManager {
 	 * @param keyPair
 	 * @return
 	 */
-	public static Key getPublicKey(KeyPair keyPair)
+	public static PublicKey getPublicKey(KeyPair keyPair)
 	{
 		return keyPair.getPublic();
 	}

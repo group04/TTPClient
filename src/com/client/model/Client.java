@@ -9,11 +9,11 @@ public class Client {
 	private PublicKey publicKey;
 	private PrivateKey privateKey;
 	
-	public Client(String id, PublicKey publicKey, PrivateKey privateKey)
+	public Client(String id)
 	{
 		this.id = id;
-		this.publicKey = publicKey;
-		this.privateKey = privateKey;
+		this.publicKey = null;
+		this.privateKey = null;
 	}
 
 	public String getId() {

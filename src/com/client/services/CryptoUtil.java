@@ -104,7 +104,7 @@ public class CryptoUtil {
 		 * @throws InvalidKeyException
 		 * @throws SignatureException
 		 */
-		public boolean verifyDoc(byte[] data, byte[] sigBytes, PublicKey publicKey) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+		public static boolean verifyDoc(byte[] data, byte[] sigBytes, PublicKey publicKey) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
 	        Signature signature = Signature.getInstance("SHA256withRSA");
 	        signature.initVerify(publicKey);
 	        signature.update(data);
