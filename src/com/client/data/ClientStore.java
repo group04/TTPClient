@@ -7,8 +7,10 @@ import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 
 import com.client.model.User;
@@ -19,7 +21,8 @@ import com.client.services.KeyManager;
 public class ClientStore {
 	private User sender;
 	private User receiver;
-	private String alias;
+	private String senderAlias;
+	private String receiverAlias;
 	private String keyStorePassword;
 	private String keyStorePath;
 	private byte[] docToSend;
@@ -36,11 +39,12 @@ public class ClientStore {
 	 * @param keyStorePassword
 	 * @param keyStorePath
 	 */
-	public ClientStore(User sender, User receiver, String alias, String keyStorePassword, String keyStorePath)
+	public ClientStore(User sender, User receiver, String senderAlias, String receiverAlias, String keyStorePassword, String keyStorePath)
 	{
 		this.sender = sender;
 		this.receiver = receiver;
-		this.alias = alias;
+		this.senderAlias = senderAlias;
+		this.receiverAlias = receiverAlias;
 		this.keyStorePassword = keyStorePassword;
 		this.keyStorePath = keyStorePath;	
 		
@@ -55,9 +59,15 @@ public class ClientStore {
 	{
 		try {
 			KeyStore keyStore = KeyManager.getKeyStore(keyStorePassword, keyStorePath);
-			KeyPair keyPair = KeyManager.getKeyPair(keyStore, alias, keyStorePassword.toCharArray());
+			KeyPair keyPair = KeyManager.getKeyPair(keyStore, senderAlias, keyStorePassword.toCharArray());
 			sender.setPrivateKey(keyPair.getPrivate());
 			sender.setPublicKey(keyPair.getPublic());
+			
+			// public key for receiver 
+			// Get certificate of public key
+            Certificate cert = keyStore.getCertificate(receiverAlias);
+            PublicKey publicKey = cert.getPublicKey();
+			receiver.setPublicKey(publicKey);
 		} catch (KeyStoreException | NoSuchAlgorithmException
 				| CertificateException | IOException | UnrecoverableKeyException e) {
 			// TODO Auto-generated catch block
@@ -117,14 +127,14 @@ public class ClientStore {
 	 * @return the alias
 	 */
 	public String getAlias() {
-		return alias;
+		return senderAlias;
 	}
 
 	/**
 	 * @param alias the alias to set
 	 */
 	public void setAlias(String alias) {
-		this.alias = alias;
+		this.senderAlias = alias;
 	}
 
 	/**
