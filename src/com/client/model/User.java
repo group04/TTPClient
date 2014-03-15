@@ -3,13 +3,13 @@ package com.client.model;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
-public class Client {
+public class User {
 	
 	private String id;
 	private PublicKey publicKey;
 	private PrivateKey privateKey;
 	
-	public Client(String id)
+	public User(String id)
 	{
 		this.id = id;
 		this.publicKey = null;
@@ -56,7 +56,7 @@ public class Client {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Client other = (Client) obj;
+		User other = (User) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;

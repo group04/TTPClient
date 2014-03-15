@@ -1,5 +1,6 @@
 package com.client.data;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
@@ -10,13 +11,14 @@ import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 
-import com.client.model.Client;
+import com.client.model.User;
 import com.client.services.CryptoUtil;
 import com.client.services.FileProcessor;
 import com.client.services.KeyManager;
 
 public class ClientStore {
-	private Client client;
+	private User sender;
+	private User receiver;
 	private String alias;
 	private String keyStorePassword;
 	private String keyStorePath;
@@ -25,6 +27,8 @@ public class ClientStore {
 	private byte[] eoo;
 	private byte[] eor;
 	
+	private File file;
+	
 	/**
 	 * 
 	 * @param client
@@ -32,9 +36,10 @@ public class ClientStore {
 	 * @param keyStorePassword
 	 * @param keyStorePath
 	 */
-	public ClientStore(Client client, String alias, String keyStorePassword, String keyStorePath)
+	public ClientStore(User sender, User receiver, String alias, String keyStorePassword, String keyStorePath)
 	{
-		this.client = client;
+		this.sender = sender;
+		this.receiver = receiver;
 		this.alias = alias;
 		this.keyStorePassword = keyStorePassword;
 		this.keyStorePath = keyStorePath;	
@@ -51,8 +56,8 @@ public class ClientStore {
 		try {
 			KeyStore keyStore = KeyManager.getKeyStore(keyStorePassword, keyStorePath);
 			KeyPair keyPair = KeyManager.getKeyPair(keyStore, alias, keyStorePassword.toCharArray());
-			client.setPrivateKey(keyPair.getPrivate());
-			client.setPublicKey(keyPair.getPublic());
+			sender.setPrivateKey(keyPair.getPrivate());
+			sender.setPublicKey(keyPair.getPublic());
 		} catch (KeyStoreException | NoSuchAlgorithmException
 				| CertificateException | IOException | UnrecoverableKeyException e) {
 			// TODO Auto-generated catch block
@@ -67,9 +72,10 @@ public class ClientStore {
 	public void prepareDocToSend(String docPath)
 	{
 		try {
+			file = new File(docPath);
 			docToSend = FileProcessor.fileToBytes(docPath);
 			hashOfDoc = CryptoUtil.getHash(docToSend);
-			eoo = CryptoUtil.signDoc(hashOfDoc, client.getPrivateKey());
+			eoo = CryptoUtil.signDoc(hashOfDoc, sender.getPrivateKey());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -88,15 +94,23 @@ public class ClientStore {
 	/**
 	 * @return the client
 	 */
-	public Client getClient() {
-		return client;
+	public User getSender() {
+		return sender;
 	}
 
 	/**
 	 * @param client the client to set
 	 */
-	public void setClient(Client client) {
-		this.client = client;
+	public void setSender(User client) {
+		this.sender = client;
+	}
+
+	public User getReceiver() {
+		return receiver;
+	}
+
+	public void setReceiver(User receiver) {
+		this.receiver = receiver;
 	}
 
 	/**
@@ -195,5 +209,13 @@ public class ClientStore {
 	 */
 	public void setEor(byte[] eor) {
 		this.eor = eor;
+	}
+
+	public File getFile() {
+		return file;
+	}
+
+	public void setFile(File file) {
+		this.file = file;
 	}
 }
