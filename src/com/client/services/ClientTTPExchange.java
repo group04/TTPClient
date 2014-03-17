@@ -34,7 +34,7 @@ import com.sun.jersey.api.representation.Form;
 public class ClientTTPExchange {
 	private ClientStore clientStore;
 	private Client client;
-	private static  String BASE_URI = "http://localhost:8080/project/rest";
+	private static  String BASE_URI = "http://localhost:8080/TDS3/rest";
 
 	
 	public ClientTTPExchange(ClientStore clientStore)
@@ -45,7 +45,7 @@ public class ClientTTPExchange {
 	/**
 	 * 
 	 */
-	private void connect() {
+	public void connect() {
 		   ClientConfig config = new DefaultClientConfig();
 		   client = Client.create(config);
 		   client.setReadTimeout(50000);		   
@@ -63,16 +63,18 @@ public class ClientTTPExchange {
 	 */
 	public void registerWithTTP()
 	{
+		connect();
 		User user = clientStore.getSender();		
 		WebResource service = client.resource(UriBuilder.fromUri(BASE_URI).build());
 		Form form = new Form(); 
 		form.add("id", user.getId());    
-		form.add("publicKkey", user.getPublicKey());    		
+		form.add("publicKey", user.getPublicKey());    		
 		
 		//send this form to the server and get response
 	    ClientResponse response = service.path("/register/client").type(MediaType.APPLICATION_FORM_URLENCODED)
 	            .post(ClientResponse.class, form);
 	    System.out.println(response.getEntity(String.class));
+	    disconnect();
 	}
 	
 	/**
@@ -81,8 +83,9 @@ public class ClientTTPExchange {
 	 * @throws ClientProtocolException
 	 * @throws IOException
 	 */
-	public void sendFile(String path) throws ClientProtocolException, IOException
+	public void sendFile() throws ClientProtocolException, IOException
 	{
+		connect();
 		HttpClient httpclient = new DefaultHttpClient();
 		HttpPost httppost = new HttpPost(BASE_URI + "/upload/file");
 
@@ -102,7 +105,8 @@ public class ClientTTPExchange {
 	      String line = "";
 	      while ((line = rd.readLine()) != null) {
 	        System.out.println(line);
-	      }     
+	      }  
+	    disconnect();
 	}
 	
 	/**
@@ -112,6 +116,7 @@ public class ClientTTPExchange {
 	 */
 	public void getFile() throws ClientProtocolException, IOException
 	{
+		connect();
 		HttpClient httpclient = new DefaultHttpClient();
 		HttpPost httppost = new HttpPost(BASE_URI + "/download/file");
 	
@@ -139,6 +144,7 @@ public class ClientTTPExchange {
 				System.out.println(line);
 			}
 		}
+		disconnect();
 	}
 	
 	/**
@@ -146,6 +152,7 @@ public class ClientTTPExchange {
 	 */
 	public void getEor()
 	{
+		connect();
 		User user = clientStore.getSender();
         byte[] hash = clientStore.getHashOfDoc();
         String fileId = new String(Base64.encodeBase64(hash));
@@ -177,6 +184,7 @@ public class ClientTTPExchange {
 		{
 			 System.out.println("Error: " + response.getEntity(String.class));
 		}
+		disconnect();
 	}
 	
 	/**
@@ -184,6 +192,7 @@ public class ClientTTPExchange {
 	 */
 	public void getEoo()
 	{
+		connect();
 		User user = clientStore.getSender();
         byte[] hash = clientStore.getHashOfDoc();
         String fileId = new String(Base64.encodeBase64(hash));
@@ -213,7 +222,9 @@ public class ClientTTPExchange {
 		{
 			 System.out.println("Error: " + response.getEntity(String.class));
 		}
+	    disconnect();
 	}
+	
 	
 
 }
